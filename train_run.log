@@ -1,0 +1,86 @@
+
+============================================================
+  DINOv2SegFormer v4 — ULTIMATE FLOOD PIPELINE
+============================================================
+Device : cuda
+GPU    : NVIDIA GeForce RTX 4070 SUPER
+VRAM   : 12.9 GB
+PyTorch: 2.5.1+cu121
+
+FAST_MODE: loading cached pixel distribution.
+
+  Auto class weights:
+    Background             1.00
+    Building-Flooded       1.00
+    Building-NF            1.00
+    Road-Flooded           1.00
+    Road-NF                1.00
+    Water                  1.00
+    Tree                   1.00
+    Vehicle                4.41
+    Pool                   3.89
+    Grass                  1.00
+[train] Dataset: 1445 pairs | augment=False
+[val] Dataset: 450 pairs | augment=False
+[test] Dataset: 448 pairs | augment=False
+Computing sample weights...
+  Flood images: 748/1445 (51.8%)
+Train batches: 362 | Val: 450 | Test: 448
+
+FAST_MODE: skipping YOLO load.
+
+Building DINOv2SegFormer v4...
+facebook/dinov2-large hidden_size: 1024
+  ASPPDecoder (+BoundaryHead): flood bias on [1, 3, 5]
+Phase 1 — Trainable: 14.2M / 318.6M
+Seg shape: torch.Size([1, 10, 512, 512]) | Aux: torch.Size([1, 1, 512, 512]) | Coarse: torch.Size([1, 10, 512, 512])
+torch.compile() skipped (Windows)
+
+Resuming from: C:\Users\nielitpatna\Desktop\Flood\flood_output_v4\checkpoint_last.pth
+  (optimizer state mismatch - using fresh optimizer: loaded state dict contains a parameter group that doesn't match the size of optimizer's group)
+  (scheduler state mismatch - using fresh scheduler)
+  Resumed epoch 35 | best mIoU: 66.14%
+
+=================================================================
+  DINOv2SegFormer v4 — Training
+  Epochs : 40 | Patience : 6
+  Warmup : 3 | Freeze  : 2
+  SWA    : epoch 9999+
+  Loss   : Focal+Tversky+Lovász+SCE + BCE-aux + Coarse-seg
+  Novel  : Channel-Attn | BoundaryRefinement | Mosaic | GridShuffle
+  Resume : True | Save every 5 epochs
+=================================================================
+
+Epoch 36/40
+
+============================================================
+  DINOv2SegFormer v4 — ULTIMATE FLOOD PIPELINE
+============================================================
+Device : cuda
+GPU    : NVIDIA GeForce RTX 4070 SUPER
+VRAM   : 12.9 GB
+PyTorch: 2.5.1+cu121
+
+============================================================
+  DINOv2SegFormer v4 — ULTIMATE FLOOD PIPELINE
+============================================================
+Device : cuda
+GPU    : NVIDIA GeForce RTX 4070 SUPER
+VRAM   : 12.9 GB
+PyTorch: 2.5.1+cu121
+
+============================================================
+  DINOv2SegFormer v4 — ULTIMATE FLOOD PIPELINE
+============================================================
+Device : cuda
+GPU    : NVIDIA GeForce RTX 4070 SUPER
+VRAM   : 12.9 GB
+PyTorch: 2.5.1+cu121
+
+============================================================
+  DINOv2SegFormer v4 — ULTIMATE FLOOD PIPELINE
+============================================================
+Device : cuda
+GPU    : NVIDIA GeForce RTX 4070 SUPER
+VRAM   : 12.9 GB
+PyTorch: 2.5.1+cu121

@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flood Detection System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header .author {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .header .credentials {
+            font-size: 1em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .upload-section {
+            background: #f8f9fa;
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: #764ba2;
+            background: #f0f4ff;
+        }
+
+        .upload-section.dragover {
+            border-color: #764ba2;
+            background: #e8f0ff;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .upload-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .preview-section {
+            display: none;
+            margin-bottom: 30px;
+        }
+
+        .preview-section.active {
+            display: block;
+        }
+
+        .image-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .image-box {
+            flex: 1;
+            min-width: 300px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .image-box h3 {
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .image-box img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .results-section {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .results-section.active {
+            display: block;
+        }
+
+        .status-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .status-card.flooded {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .status-card.non-flooded {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .status-card h2 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .status-card .percentage {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+
+        .metric-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .metric-card .value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .recommendations {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .recommendations h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+
+        .recommendations ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .recommendations li {
+            padding: 10px 0;
+            border-bottom: 1px solid #ffeeba;
+            color: #856404;
+        }
+
+        .recommendations li:last-child {
+            border-bottom: none;
+        }
+
+        .class-breakdown {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .class-breakdown h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .class-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .class-item:last-child {
+            border-bottom: none;
+        }
+
+        .class-name {
+            font-weight: 500;
+        }
+
+        .class-percentage {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            display: none;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #dc3545;
+        }
+
+        .error.active {
+            display: block;
+        }
+
+        .model-info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #004085;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌊 Flood Detection System</h1>
+            <div class="author">NEERAJ RATHORE</div>
+            <div class="credentials">M.Sc. Data Science & Applied Statistics</div>
+            <p>AI-Powered Flood Analysis Using DINOv2SegFormer V5 + YOLOv8</p>
+        </div>
+
+        <div class="content">
+            <div class="upload-section" id="uploadSection">
+                <div class="upload-icon">📁</div>
+                <h2>Upload Satellite/Aerial Image</h2>
+                <p>Drag and drop an image here or click to browse</p>
+                <input type="file" id="fileInput" accept="image/*">
+                <button class="upload-btn" id="uploadBtn">Choose Image</button>
+            </div>
+
+            <div class="preview-section" id="previewSection">
+                <div class="image-container">
+                    <div class="image-box">
+                        <h3>Original Image</h3>
+                        <img id="originalImage" src="" alt="Original">
+                    </div>
+                    <div class="image-box">
+                        <h3>Segmentation Mask</h3>
+                        <img id="segmentationImage" src="" alt="Segmentation">
+                    </div>
+                </div>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <h2>Analyzing Image...</h2>
+                <p>Please wait while our AI processes your image</p>
+            </div>
+
+            <div class="error" id="error"></div>
+
+            <div class="results-section" id="resultsSection">
+                <div class="status-card" id="statusCard">
+                    <h2 id="statusTitle">FLOODED</h2>
+                    <div class="percentage" id="floodPercentage">0%</div>
+                    <p>Flood Area Detected</p>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <h4>Confidence</h4>
+                        <div class="value" id="confidence">0%</div>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Inference Time</h4>
+                        <div class="value" id="inferenceTime">0ms</div>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Dominant Class</h4>
+                        <div class="value" id="dominantClass">-</div>
+                    </div>
+                    <div class="metric-card">
+                        <h4>YOLO Detections</h4>
+                        <div class="value" id="yoloDetections">0</div>
+                    </div>
+                </div>
+
+                <div class="class-breakdown">
+                    <h3>Class Breakdown</h3>
+                    <div id="classBreakdown"></div>
+                </div>
+
+                <div class="recommendations">
+                    <h3>🚨 Recommendations</h3>
+                    <ul id="recommendations"></ul>
+                </div>
+
+                <div class="download-section" style="text-align: center; margin-top: 20px;">
+                    <button id="downloadPdfBtn" class="upload-btn" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        📄 Download PDF Report
+                    </button>
+                </div>
+
+                <div class="model-info">
+                    <strong>Model Info:</strong> DINOv2SegFormer V5 (dinov2-small) | YOLOv8m |
+                    <span id="modelTimestamp"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000/predict';
+        
+        const uploadSection = document.getElementById('uploadSection');
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const previewSection = document.getElementById('previewSection');
+        const originalImage = document.getElementById('originalImage');
+        const segmentationImage = document.getElementById('segmentationImage');
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+        const resultsSection = document.getElementById('resultsSection');
+        const statusCard = document.getElementById('statusCard');
+        const statusTitle = document.getElementById('statusTitle');
+        const floodPercentage = document.getElementById('floodPercentage');
+        const confidence = document.getElementById('confidence');
+        const inferenceTime = document.getElementById('inferenceTime');
+        const dominantClass = document.getElementById('dominantClass');
+        const yoloDetections = document.getElementById('yoloDetections');
+        const classBreakdown = document.getElementById('classBreakdown');
+        const recommendations = document.getElementById('recommendations');
+        const modelTimestamp = document.getElementById('modelTimestamp');
+        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+
+        let currentFile = null;
+
+        uploadBtn.addEventListener('click', () => fileInput.click());
+        
+        uploadSection.addEventListener('click', (e) => {
+            if (e.target !== uploadBtn) fileInput.click();
+        });
+
+        uploadSection.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadSection.classList.add('dragover');
+        });
+
+        uploadSection.addEventListener('dragleave', () => {
+            uploadSection.classList.remove('dragover');
+        });
+
+        uploadSection.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadSection.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                handleFile(file);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) handleFile(file);
+        });
+
+        function handleFile(file) {
+            currentFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                originalImage.src = e.target.result;
+                previewSection.classList.add('active');
+                analyzeImage(file);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        downloadPdfBtn.addEventListener('click', async () => {
+            if (!currentFile) {
+                alert('Please upload an image first');
+                return;
+            }
+
+            downloadPdfBtn.disabled = true;
+            downloadPdfBtn.textContent = 'Generating PDF...';
+
+            const formData = new FormData();
+            formData.append('file', currentFile);
+
+            try {
+                const response = await fetch('http://localhost:8000/predict/pdf', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `flood_report_${new Date().toISOString().slice(0,10)}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } catch (err) {
+                alert(`Error generating PDF: ${err.message}`);
+            } finally {
+                downloadPdfBtn.disabled = false;
+                downloadPdfBtn.textContent = '📄 Download PDF Report';
+            }
+        });
+
+        async function analyzeImage(file) {
+            loading.classList.add('active');
+            error.classList.remove('active');
+            resultsSection.classList.remove('active');
+            uploadBtn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                displayResults(data);
+            } catch (err) {
+                error.textContent = `Error: ${err.message}. Please make sure the API is running on http://localhost:8000`;
+                error.classList.add('active');
+            } finally {
+                loading.classList.remove('active');
+                uploadBtn.disabled = false;
+            }
+        }
+
+        function displayResults(data) {
+            // Display segmentation mask
+            segmentationImage.src = `data:image/png;base64,${data.segmentation_mask_b64}`;
+            
+            // Update status
+            statusTitle.textContent = data.status;
+            floodPercentage.textContent = `${data.flood_percentage.toFixed(1)}%`;
+            
+            if (data.status === 'FLOODED') {
+                statusCard.classList.add('flooded');
+                statusCard.classList.remove('non-flooded');
+            } else {
+                statusCard.classList.add('non-flooded');
+                statusCard.classList.remove('flooded');
+            }
+
+            // Update metrics
+            confidence.textContent = `${(data.confidence * 100).toFixed(1)}%`;
+            inferenceTime.textContent = `${data.inference_time_ms.toFixed(1)}ms`;
+            dominantClass.textContent = data.dominant_class;
+            yoloDetections.textContent = data.yolo_detections.length;
+
+            // Display class breakdown
+            classBreakdown.innerHTML = data.class_breakdown
+                .sort((a, b) => b.percentage - a.percentage)
+                .map(item => `
+                    <div class="class-item">
+                        <span class="class-name">${item.class_name} ${item.is_flooded ? '🌊' : ''}</span>
+                        <span class="class-percentage">${item.percentage.toFixed(2)}%</span>
+                    </div>
+                `).join('');
+
+            // Display recommendations
+            recommendations.innerHTML = data.recommendations
+                .map(rec => `<li>${rec}</li>`)
+                .join('');
+
+            // Update model info
+            modelTimestamp.textContent = new Date(data.timestamp).toLocaleString();
+
+            resultsSection.classList.add('active');
+        }
+    </script>
+</body>
+</html>
