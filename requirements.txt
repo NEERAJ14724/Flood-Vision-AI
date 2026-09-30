@@ -6,7 +6,7 @@ fpdf2==2.7.8
 folium==0.16.0
 numpy==1.26.4
 opencv-python==4.9.0.80
-Pillow==10.2.0
+Pillow==11.3.0
 tqdm==4.66.2
 matplotlib==3.8.4
 fastapi
